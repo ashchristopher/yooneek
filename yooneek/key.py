@@ -11,12 +11,13 @@ class IDGenerator(object):
 
     """
 
-    MAX_SEQ = 4095
+    MAX_SEQ = 4096
 
     def __init__(self):
         self.host = 1
         self.sequence = 0
         self.timestamp = 0
+        self._last_key = 0
     
     def _prime_timestamp(self):
         # not all versions of Python support getting milli-seconds, so we only rely on seconds
@@ -28,13 +29,10 @@ class IDGenerator(object):
         self.timestamp = timestamp
 
     def _prime_sequence(self):
-        seq = self.sequence + 1
-        if seq > IDGenerator.MAX_SEQ:
-            self.sequence = 0
-        else:
-            self.sequence = seq
+        self.sequence = self.sequence % IDGenerator.MAX_SEQ
+        self.sequence += 1
 
-    def generate_key(self):
+    def _generate_key(self):
         self._prime_sequence()
         self._prime_timestamp()
     
@@ -43,5 +41,15 @@ class IDGenerator(object):
         key |= self.sequence
 
         return key
+
+    def key(self):
+        key = self._generate_key()
+        
+        # if the requests for keys is faster than 4096 keys/second, we risk seeing collisions
+        if key <= self._last_key:
+            # wait for the second to change, then get the key
+            time.sleep(1)
+            key = self._generate_key()
+        self._last_key = key
 
 generator = IDGenerator()
