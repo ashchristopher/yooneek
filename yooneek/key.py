@@ -6,7 +6,7 @@ class IDGenerator(object):
     64-bits
     ---------
     41-bits  -> timestamp (in seconds)
-    11-bits  -> host index (up to 2047 unique hosts)
+    11-bits  -> worker_id index (up to 2047 unique workers/hosts)
     12-bits  -> sequence (up to 4095 unique keys/second)
 
     """
@@ -14,7 +14,7 @@ class IDGenerator(object):
     MAX_SEQ = 4096
 
     def __init__(self):
-        self.host = 1
+        self.worker_id = 1
         self.sequence = 0
         self.timestamp = 0
         self._last_key = 0
@@ -37,7 +37,7 @@ class IDGenerator(object):
         self._prime_timestamp()
     
         key = self.timestamp << (64 - 41)
-        key |= self.host << (64 - 41 - 11)
+        key |= self.worker_id << (64 - 41 - 11)
         key |= self.sequence
 
         return key
