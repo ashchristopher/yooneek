@@ -2,8 +2,16 @@ import time
 
 
 class IDGenerator(object):
+    """
+    64-bits
+    ---------
+    41-bits  -> timestamp (in seconds)
+    11-bits  -> host index (up to 2047 unique hosts)
+    12-bits  -> sequence (up to 4095 unique keys/second)
 
-    MAX_SEQ = 0b11111111111
+    """
+
+    MAX_SEQ = 4095
 
     def __init__(self):
         self.host = 1
