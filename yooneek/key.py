@@ -1,4 +1,5 @@
 import time
+import sys
 
 
 class IDGenerator(object):
@@ -44,9 +45,8 @@ class IDGenerator(object):
 
     def key(self):
         key = self._generate_key()
-        
         # if the requests for keys is faster than 4096 keys/second, we risk seeing collisions
-        if key <= self._last_key:
+        while key <= self._last_key:
             # wait for the second to change, then get the key
             time.sleep(1)
             key = self._generate_key()
