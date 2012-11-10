@@ -8,7 +8,7 @@ class IDGenerator(object):
     ---------
     41-bits  -> timestamp (in seconds)
     11-bits  -> worker_id index (up to 2047 unique workers/hosts)
-    12-bits  -> sequence (up to 4095 unique keys/second)
+    12-bits  -> sequence (up to 4095 unique keys/milisecond)
 
     """
 
@@ -35,8 +35,9 @@ class IDGenerator(object):
         self.sequence = self.sequence % IDGenerator.MAX_SEQ
         self.sequence += 1
 
-    def _generate_key(self):
-        self._prime_sequence()
+    def _generate_key(self, collision=False):
+        if collision:
+            self._prime_sequence()
         self._prime_timestamp()
     
         key = self.timestamp << (64 - 41)
@@ -50,10 +51,9 @@ class IDGenerator(object):
         # if the requests for keys is faster than 4096 keys/second, we risk seeing collisions
         while key <= self._last_key:
             # wait for the millisecond to change, then get the key
-            sys.stdout.write('x')
+            sys.stdout.write('.')
             sys.stdout.flush()
-            time.sleep(0.001)
-            key = self._generate_key()
+            key = self._generate_key(collision=True)
         self._last_key = key
         return key
 

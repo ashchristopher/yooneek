@@ -11,8 +11,9 @@ x = 1
 while True:
     socket.send("key")
     message = socket.recv()
-    sys.stdout.write("{0}  Key: {1}\n".format(x, message))
+    # sys.stdout.write("{0}  Key: {1}\n".format(x, message))
     x += 1
-    if not x % 100000:
-        sys.stdout.flush()
-    time.sleep(0.0001)
+    if not x % 1000:
+        print x
+        # sys.stdout.flush()
+    time.sleep(0.001)
